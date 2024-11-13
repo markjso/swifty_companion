@@ -1,5 +1,4 @@
 import { registerRootComponent } from 'expo';
-require('dotenv').config();
 
 import App from './App';
 

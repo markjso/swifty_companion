@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image, FlatList } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, FlatList, Alert } from 'react-native';
 import { searchUsers } from './api/api';
 
 export default function App() {
@@ -8,9 +8,13 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [found, setFound] = useState(true);
 
   const handleSearch = async () => {
-    if (!query.trim()) return;
+    if (!query.trim()) {
+      Alert.alert('Error', 'Query is empty');
+      return;
+    }
 
     setLoading(true);
 
@@ -43,6 +47,7 @@ export default function App() {
       <Button title="Search User" onPress={handleSearch} />
 
       {loading && <Text style={styles.loadingText}>Loading ..</Text>}
+      {!found && <Text style={styles.loadingText}>User not found</Text>}
 
       <FlatList
         data={users}
