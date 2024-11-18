@@ -1,37 +1,49 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useState, useEffect } from 'react';
 
-const getCursusArray = (cursus) => {
-  return cursus.map((skill) => ({
-    key: skill.cursus.id,
-    name: skill.cursus.name,
-  }));
-};
 
-export default function ProfileScreen({route, navigation }) {
-  const {user} = route.params; 
-  const [selectedCursus, setSelectedCursus] = useState('21');
+export default function ProfileScreen({ route, navigation }) {
+  const { user } = route.params;
+  
+  const displaySkills = (skills) => {
+    return skills
+      .sort((a, b) => b.level - a.level)
+      .map((skill) => (
+        <View key={skill.id} style={styles.container}>
+          <Text
+            style={[
+              styles.text,
+              {
+                fontSize: skill.name.length > 30 ? 12 : 14,
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {skill.name}
+          </Text>
 
-    const cursusArray = user.cursus_users ? getCursusArray(user.cursus_users) : [];
+          <View style={styles.skill_level}>
+            <Text style={styles.text}>lvl {skill.level}</Text>
+          </View>
+        </View>
+      ));
+  };
 
-return (
+  return (
     <View style={styles.container}>
-    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={30} color='white'/>
-        </TouchableOpacity>
-      <Image
-        style={styles.userImage}
-        source={{ uri:user.profilePicture }}
-        />
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Icon name="arrow-back" size={30} color="white" />
+      </TouchableOpacity>
+      <Image style={styles.userImage} source={{ uri: user.profilePicture }} />
       <View style={styles.row}>
         <Text style={styles.label}>Name</Text>
         <Text style={styles.value}>{user.firstName} {user.lastName}</Text>
-      </View>  
+      </View>
       <View style={styles.row}>
         <Text style={styles.label}>Campus</Text>
         <Text style={styles.value}>{user.campus}</Text>
-      </View>  
+      </View>
       <View style={styles.row}>
         <Text style={styles.label}>Wallet</Text>
         <Text style={styles.value}>{user.wallet} ₳</Text>
@@ -42,14 +54,15 @@ return (
       </View>
       <View style={styles.container}>
         <Text style={styles.text}>Skills</Text>
-        {cursusArray.map((skill, index) => (
-          <Text key={index} style={styles.text}>{skill.name}</Text>
+        {user.cursus_users[1].skills.length > 0 && (
+        <Text style={styles.text}>Skills:</Text>
+      )}
+        {displaySkills(user.cursus_users[1].skills)}
         ))}
       </View>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -95,5 +108,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     left: 20,
+  },
+  skill_level: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
