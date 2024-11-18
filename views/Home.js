@@ -7,6 +7,7 @@ export default function HomeScreen() {
   const [text, setText] = useState('');
   const [query, setQuery] = useState('');
   const [found, setFound] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const image = {uri: 'https://auth.42.fr/auth/resources/yyzrk/login/students/img/bkgrnd.jpg'};
 
@@ -17,6 +18,7 @@ export default function HomeScreen() {
       return;
     }
 
+  setLoading(true);
     try {
       const user = await searchUsers(sanitizedQuery);
       if (user) {
@@ -24,6 +26,8 @@ export default function HomeScreen() {
       }
     } catch (error) {
       console.error('Search error', error);
+    } finally {
+    setLoading(false);
     }
   };
 
