@@ -1,83 +1,99 @@
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useState, useEffect } from 'react';
 
-const INTRA_CLIENT_ID = "u-s4t2ud-f38935f9680154b391f5f4f4540a392546731f574fbd3502235239a7f754be59";
-const INTRA_CLIENT_SECRET = "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";
-const TOKEN_URL = "https://api.intra.42.fr/oauth/token";
-const USER_URL = "https://api.intra.42.fr/v2/users/";
-
-export const getAccessToken = async () => {
-	const response = await axios.post(TOKEN_URL, {
-		grant_type: "client_credentials",
-		client_id: INTRA_CLIENT_ID,
-		client_secret: INTRA_CLIENT_SECRET,
-	});
-
-  	return response.data.access_token;
+const getCursusArray = (cursus) => {
+  return cursus.map((skill) => ({
+    key: skill.cursus.id,
+    name: skill.cursus.name,
+  }));
 };
 
-let accessToken = null;
+export default function ProfileScreen({route, navigation }) {
+  const {user} = route.params; 
+  const [selectedCursus, setSelectedCursus] = useState('21');
 
-async function initializeAccessToken() {
-  accessToken = await getAccessToken();
+    const cursusArray = user.cursus_users ? getCursusArray(user.cursus_users) : [];
+
+return (
+    <View style={styles.container}>
+    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={30} color='white'/>
+        </TouchableOpacity>
+      <Image
+        style={styles.userImage}
+        source={{ uri:user.profilePicture }}
+        />
+      <View style={styles.row}>
+        <Text style={styles.label}>Name</Text>
+        <Text style={styles.value}>{user.firstName} {user.lastName}</Text>
+      </View>  
+      <View style={styles.row}>
+        <Text style={styles.label}>Campus</Text>
+        <Text style={styles.value}>{user.campus}</Text>
+      </View>  
+      <View style={styles.row}>
+        <Text style={styles.label}>Wallet</Text>
+        <Text style={styles.value}>{user.wallet} ₳</Text>
+      </View>
+      <View style={styles.row}>
+        <Text style={styles.label}>Evaluation Points</Text>
+        <Text style={styles.value}>{user.evalPoints}</Text>
+      </View>
+      <View style={styles.container}>
+        <Text style={styles.text}>Skills</Text>
+        {cursusArray.map((skill, index) => (
+          <Text key={index} style={styles.text}>{skill.name}</Text>
+        ))}
+      </View>
+    </View>
+  );
 }
 
-initializeAccessToken();
 
-export const searchUsers = async (login) => {
-  if (!accessToken) {
-    Alert.alert('Info', 'Initializing access token');
-    await initializeAccessToken();
-  }
-
-  try {
-    const response = await axios.get(`${USER_URL}/${login}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-   if (response.status === 200) {
-     const data = response.data;
-      const user = {
-                    login: data.login,
-                    firstName: data.first_name,
-                    lastName: data.last_name,
-                    email: data.email,
-                    profilePicture: data.image.link,
-                    wallet: data.wallet,
-                    evalPoints: data.correction_point,
-                    campus: data.campus[0].name,
-                    cursus: data.cursus_users[0],
-      };
-    return user;
-    }
-  } catch (error) {
-    console.error('Error fetching users', error);
-
-    // Check if the error is a 401 Unauthorized, indicating token expiration
-    if (error.response && error.response.status === 401) {
-      Alert.alert('Info', 'Access token expired. Refreshing token.');
-      
-      // Refresh the token and retry the request
-      await initializeAccessToken();
-
-      try {
-        const retryResponse = await axios.get(`${USER_URL}/${login}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        Alert.alert('Info', 'User data fetched successfully after retry');
-        return retryResponse.data;
-      } catch (retryError) {
-        console.error('Retry failed', retryError);
-        throw new Error('Failed to fetch user data after retry');
-      }
-    }
-
-    Alert.alert('Error', 'User does not exist');
-    throw new Error('Failed to fetch user data');
-  }
-};
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1e1d1d',
+    paddingTop: 50,
+  },
+  userImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 85,
+    marginBottom: 10,
+  },
+  text: {
+    fontSize: 20,
+    color: 'white',
+    marginBottom: 10,
+    textAlign: 'left',
+    alignSelf: 'flex-start',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  label: {
+    flex: 1,
+    textAlign: 'left',
+    fontSize: 20,
+    color: 'gold',
+    paddingLeft: 30,
+  },
+  value: {
+    flex: 1,
+    textAlign: 'right',
+    fontSize: 20,
+    color: 'white',
+    paddingRight: 30,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+  },
+});
