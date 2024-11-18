@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet, Image, FlatList } from 'react-native';
 
-export default function ProfileScreen(route, navigation ) {
-  const [user, setUser] = route.params; 
+export default function ProfileScreen({route, navigation }) {
+  const {user} = route.params; 
   return (
     <View style={styles.container}>
       <Image
