@@ -13,21 +13,17 @@ export default function HomeScreen() {
   const image = {uri: 'https://auth.42.fr/auth/resources/yyzrk/login/students/img/bkgrnd.jpg'};
 
   const handleSearch = async () => {
-    if (!query.trim()) {
+    const sanitizedQuery = query.trim().toLowerCase();
+    if (!sanitizedQuery) {
       Alert.alert('Error', 'Query is empty');
       return;
     }
 
-    setLoading(true);
-
     try {
-      const result = await searchUsers(query);
-      Alert.alert('API Response', JSON.stringify(result)); 
-      setUser(result);
+      const user = await searchUsers(sanitizedQuery);
       navigation.navigate('Profile', {
 						user: user,
 					});
-      Alert.alert('Updated Users State', JSON.stringify(user));
     } catch (error) {
       console.error('Search error', error);
     } finally {
