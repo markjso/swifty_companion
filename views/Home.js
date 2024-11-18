@@ -6,8 +6,6 @@ export default function HomeScreen() {
   const [message, setMessage] = useState('Welcome to Swifty Companion!');
   const [text, setText] = useState('');
   const [query, setQuery] = useState('');
-  const [user, setUser] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [found, setFound] = useState(true);
 
   const image = {uri: 'https://auth.42.fr/auth/resources/yyzrk/login/students/img/bkgrnd.jpg'};
@@ -21,13 +19,11 @@ export default function HomeScreen() {
 
     try {
       const user = await searchUsers(sanitizedQuery);
-      navigation.navigate('Profile', {
-						user: user,
-					});
+      if (user) {
+          navigation.navigate('Profile', { user: user })
+      }
     } catch (error) {
       console.error('Search error', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -52,7 +48,6 @@ export default function HomeScreen() {
           <Text style={styles.buttonText}>Search User</Text>
         </TouchableOpacity>
 
-      {loading && <Text style={styles.loadingText}>Loading ..</Text>}
        {!found && <Text style={styles.loadingText}>User not found</Text>}
       </ImageBackground>
     </View>
@@ -69,7 +64,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     alignItems: 'center', 
     justifyContent: 'center',
-    paddingTop: 100,
   },
   logo: {
     width: 66,
@@ -90,10 +84,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    textAlign: 'center',
-  },
-  loadingText: {
-    color: 'white',
     textAlign: 'center',
   },
   button: {
