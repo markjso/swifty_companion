@@ -39,8 +39,17 @@ export const searchUsers = async (login) => {
       },
     });
 
-    Alert.alert('Info', 'User data fetched successfully');
-    return response.data;
+   if (response.status === 200) {
+      const user = {
+                    login: data.login,
+                    firstName: data.first_name,
+                    lastName: data.last_name,
+                    email: data.email,
+                    profilePicture: data.image.link,
+                    wallet: data.wallet,
+      }
+    return user;
+    }
   } catch (error) {
     console.error('Error fetching users', error);
 
@@ -69,3 +78,4 @@ export const searchUsers = async (login) => {
     throw new Error('Failed to fetch user data');
   }
 };
+
