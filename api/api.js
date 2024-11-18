@@ -1,4 +1,5 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 
 const INTRA_CLIENT_ID = "u-s4t2ud-f38935f9680154b391f5f4f4540a392546731f574fbd3502235239a7f754be59";
@@ -31,8 +32,8 @@ export const searchUsers = async (login) => {
   }
 
   try {
-    Alert.alert('Info', `Searching for user: ${user}`);
-    const response = await axios.get(`${USER_URL}${login}`, {
+    Alert.alert('Info', `Searching for user: ${login}`);
+    const response = await axios.get(`${USER_URL}/${login}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -41,8 +42,30 @@ export const searchUsers = async (login) => {
     Alert.alert('Info', 'User data fetched successfully');
     return response.data;
   } catch (error) {
-    Alert.alert('Error', 'Error fetching users');
     console.error('Error fetching users', error);
+
+    // Check if the error is a 401 Unauthorized, indicating token expiration
+    if (error.response && error.response.status === 401) {
+      Alert.alert('Info', 'Access token expired. Refreshing token.');
+      
+      // Refresh the token and retry the request
+      await initializeAccessToken();
+
+      try {
+        const retryResponse = await axios.get(`${USER_URL}/${login}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        Alert.alert('Info', 'User data fetched successfully after retry');
+        return retryResponse.data;
+      } catch (retryError) {
+        console.error('Retry failed', retryError);
+        throw new Error('Failed to fetch user data after retry');
+      }
+    }
+
+    Alert.alert('Error', 'Error fetching users');
     throw new Error('Failed to fetch user data');
   }
 };
