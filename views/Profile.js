@@ -1,34 +1,32 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, Alert, ScrollView  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import * as Progress from 'react-native-progress';
 
 export default function ProfileScreen({ route, navigation }) {
   const { user } = route.params;
-  
+
   const displaySkills = (skills) => {
     return skills
       .sort((a, b) => b.level - a.level)
       .map((skill) => (
-        <View key={skill.id} style={styles.container}>
-          <Text
-            style={[
-              styles.text,
-              {
-                fontSize: skill.name.length > 30 ? 12 : 14,
-              },
-            ]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {skill.name}
-          </Text>
-
+        <View key={skill.id} style={styles.row}>
           <View style={styles.skill_level}>
-            <Text style={styles.text}>lvl {skill.level}</Text>
+            <Text style={styles.text}>{skill.name}: {skill.level}</Text>
+            <View style={styles.progressBar}>
+              <Progress.Bar 
+                progress={skill.level / 10}
+                width={200} 
+                color='blue'
+                borderWidth={0}
+              />
+             </View> 
           </View>
         </View>
       ));
   };
+
+  const cursus = user.cursus_users && user.cursus_users.length > 1 ? user.cursus_users[1] : null;
+  const skills = cursus ? cursus.skills : [];
 
   return (
     <View style={styles.container}>
@@ -52,14 +50,16 @@ export default function ProfileScreen({ route, navigation }) {
         <Text style={styles.label}>Evaluation Points</Text>
         <Text style={styles.value}>{user.evalPoints}</Text>
       </View>
-      <View style={styles.container}>
-        <Text style={styles.text}>Skills</Text>
-        {user.cursus_users[1].skills.length > 0 && (
-        <Text style={styles.text}>Skills:</Text>
-      )}
-        {displaySkills(user.cursus_users[1].skills)}
-        ))}
-      </View>
+      <ScrollView>
+        <View style={styles.skillContainer}>
+          <Text style={styles.text}>Skills</Text>
+          {skills.length > 0 ? (
+            displaySkills(skills)
+          ) : (
+            <Text style={styles.text}>No skills found</Text>
+          )}
+        </View>
+      </ScrollView>  
     </View>
   );
 }
@@ -80,9 +80,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     color: 'white',
-    marginBottom: 10,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
@@ -109,8 +108,18 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
   },
+  skillContainer: {
+    alignItems: 'left',
+    justifyContent: 'center',
+    backgroundColor: '#1e1d1d',
+    paddingTop: 20,
+  },
   skill_level: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    textAlign: 'left',
+  },
+  progressBar: {
+    marginTop: 5,
+    width: '80%',
   },
 });
