@@ -3,22 +3,26 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './components/Home'
 import ProfileScreen from './components/Profile';
+import SkillsScreen from './components/Skills';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{headerShown: false}}
+          options={{headerShown: false, unmountOnBlur: true}}
           />
           <Stack.Screen
           name="Profile"
           component={ProfileScreen}
-          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Skills"
+          component={SkillsScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
