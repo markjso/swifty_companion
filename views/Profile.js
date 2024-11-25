@@ -47,9 +47,8 @@ export default function ProfileScreen({ route, navigation }) {
       ))
   };
 
-  const cursus = user.cursus_users && user.cursus_users.length > 1 ? user.cursus_users[1] : null;
-  const skills = cursus ? cursus.skills : [];
   const projects_users = user.projects_users;
+  const profilePlaceholderImg = require("./../assets/headshot_placeholder.jpg")
 
   const dynamicLabelStyle = {
     ...styles.label,
@@ -58,10 +57,12 @@ export default function ProfileScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate('Skills', {user})}>
-        <Text style={styles.link}>Skills</Text>
+      <TouchableOpacity style={styles.skillsLink} onPress={() => navigation.navigate('Skills', {user})}>
+        <Text style={styles.link}>Skills ></Text>
       </TouchableOpacity>
-      <Image style={styles.userImage} source={{ uri: user.profilePicture }} />
+      <Image style={styles.userImage}
+        defaultSource={profilePlaceholderImg}
+        source={{ uri: user.profilePicture }} />
       <View style={styles.row}>
         <Text style={dynamicLabelStyle}>Name</Text>
         <Text style={styles.value}>{user.firstName} {user.lastName}</Text>
@@ -78,9 +79,9 @@ export default function ProfileScreen({ route, navigation }) {
         <Text style={dynamicLabelStyle}>Evaluation Points</Text>
         <Text style={styles.value}>{user.evalPoints}</Text>
       </View>
+      <Text style={styles.title}>Projects</Text>
       <ScrollView>
         <View style={[styles.projectContainer, { alignItems: 'center' }]}>
-          <Text style={styles.title}>Projects</Text>
         {projects_users.length > 0 ? (
           listProjects(projects_users)
         ) : (
@@ -108,9 +109,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color: 'white',
+    
+    color: 'black',
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   text: {
     fontSize: 20,
@@ -141,8 +143,12 @@ const styles = StyleSheet.create({
   link: {
     fontSize: 18,
     color: 'blue',
-    textDecorationLine: 'underline',
     textAlign: 'right',
+  },
+  skillsLink: {
+    position: 'absolute',
+    top: 10,
+    right: 20,
   },
   projectContainer: {
     alignItems: 'flex-start',
