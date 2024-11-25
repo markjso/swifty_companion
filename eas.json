@@ -17,7 +17,7 @@
       "distribution": "internal",
       "channel": "preview",
       "ios": {
-        "simulator": true  // This indicates a simulator build
+        "simulator": true
       }
     },
     "production": {
