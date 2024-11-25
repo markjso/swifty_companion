@@ -1,4 +1,5 @@
 import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView  } from 'react-native';
+import { useState } from 'react';
 
 const getProjectColor = (project) => {
   if (project["validated?"] === true) {
@@ -24,6 +25,9 @@ const getProjectColor = (project) => {
 
 export default function ProfileScreen({ route, navigation }) {
   const { user, coalition } = route.params;
+  const projects_users = user.projects_users;
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const profilePlaceholderImg = require("./../assets/headshot_placeholder.png")
  
   const listProjects = (projects_users) => {
     return projects_users
@@ -47,9 +51,6 @@ export default function ProfileScreen({ route, navigation }) {
       ))
   };
 
-  const projects_users = user.projects_users;
-  const profilePlaceholderImg = require("./../assets/headshot_placeholder.jpg")
-
   const dynamicLabelStyle = {
     ...styles.label,
     color: coalition?.color || 'white', 
@@ -61,8 +62,10 @@ export default function ProfileScreen({ route, navigation }) {
         <Text style={styles.link}>Skills ></Text>
       </TouchableOpacity>
       <Image style={styles.userImage}
-        defaultSource={profilePlaceholderImg}
-        source={{ uri: user.profilePicture }} />
+        source={imageLoaded ? { uri: user.profilePicture } : profilePlaceholderImg} 
+        onLoad={() => setImageLoaded(true)}
+        onError={() => setImageLoaded(false)}
+        />
       <View style={styles.row}>
         <Text style={dynamicLabelStyle}>Name</Text>
         <Text style={styles.value}>{user.firstName} {user.lastName}</Text>
