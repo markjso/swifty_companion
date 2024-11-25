@@ -28,3 +28,6 @@ jobs:
 
       - name: 🚀 Build app
         run: eas build --platform ios --non-interactive
+        env:
+          EAS_BUILD_PROFILE: production
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
