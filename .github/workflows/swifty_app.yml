@@ -22,13 +22,15 @@ jobs:
         run: npm install
 
       - name: Install Expo CLI
-        run: npm install -g expo-cli
-
-      - name: Log in to Expo
-        run: expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }}
-
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+        uses: expo/expo-github-action@v1
+        with:
+          expo-version: latest
+          expo-cache: true
+          eas-version: latest
+          eas-cache: true
+          packager: yarn
+          patch-watchers: true
+          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build iOS
         run: eas build --platform ios --non-interactive
