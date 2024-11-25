@@ -1,35 +1,49 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, FlatList, Alert, ImageBackground, TouchableOpacity } from 'react-native';
-import { searchUsers } from '../api/api';
+import { searchUsers, getCoalition } from '../api/api';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [message, setMessage] = useState('Welcome to Swifty Companion!');
   const [text, setText] = useState('');
   const [query, setQuery] = useState('');
   const [found, setFound] = useState(true);
   const [loading, setLoading] = useState(false);
-
+ 
   const image = {uri: 'https://auth.42.fr/auth/resources/yyzrk/login/students/img/bkgrnd.jpg'};
 
-  const handleSearch = async () => {
-    const sanitizedQuery = query.trim().toLowerCase();
-    if (!sanitizedQuery) {
-      Alert.alert('Error', 'Query is empty');
+const handleSearch = async () => {
+  const userLogin = query.trim().toLowerCase();
+  if (!userLogin) {
+    Alert.alert('Error', 'Query cannot be empty');
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const user = await searchUsers(userLogin);
+    if (!user) {
+      Alert.alert('No Results', 'No user found with this query.');
       return;
     }
 
-  setLoading(true);
-    try {
-      const user = await searchUsers(sanitizedQuery);
-      if (user) {
-          navigation.navigate('Profile', { user: user })
+    let coalition = null;
+
+    if (user?.login) {
+      const data = await getCoalition(userLogin);
+      if (data && data.length > 0) {
+        coalition = data[0];
+      } else {
+        Alert.alert('No Results', 'No coalition found for this user.');
       }
-    } catch (error) {
-      console.error('Search error', error);
-    } finally {
-    setLoading(false);
     }
-  };
+    navigation.navigate('Profile', { user, coalition });
+  } catch (error) {
+    console.error('Search error:', error);
+     Alert.alert('Error', `${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <View style={styles.container}>
