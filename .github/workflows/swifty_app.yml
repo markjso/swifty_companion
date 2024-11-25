@@ -1,4 +1,4 @@
-name: Build iOS
+name: Build and Deploy Expo App
 
 on:
   push:
@@ -27,8 +27,13 @@ jobs:
       - name: Log in to Expo
         run: expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }}
 
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
       - name: Build iOS
         run: eas build --platform ios --non-interactive
         env:
           EAS_BUILD_PROFILE: production
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
