@@ -16,7 +16,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: 18.x
+          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -25,11 +26,8 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          expo-cache: true
           eas-version: latest
-          eas-cache: true
-          packager: yarn
-          patch-watchers: true
+          packager: npm
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build iOS
