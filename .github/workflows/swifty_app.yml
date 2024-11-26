@@ -1,7 +1,7 @@
-name: Build and Deploy Expo App
+# name: Build and Deploy Expo App
 
 on:
-  push:
+  # push:
     branches:
       - main
 
