@@ -1,9 +1,9 @@
 # name: Build and Deploy Expo App
 
-on:
+# on:
   # push:
-    branches:
-      - main
+    # branches:
+     # - main
 
 jobs:
   build:
